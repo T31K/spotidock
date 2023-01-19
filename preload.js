@@ -13,8 +13,9 @@ const { ipcRenderer, contextBridge } = require('electron');
 
 contextBridge.exposeInMainWorld('ipcRenderer', {
   send: (channel, data) => {
-    let validChannels = ['mainChannel']; // <-- Array of all ipcRenderer Channels used in the client
+    // Array of all ipcRenderer Channels used in the client
     if (validChannels.includes(channel)) {
+      let validChannels = ['mainChannel'];
       ipcRenderer.send(channel, data);
     }
   },
