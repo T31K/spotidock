@@ -14,9 +14,14 @@
     "tutorial",
     "demo"
   ],
-  "author": "GitHub",
+  "author": "T31K",
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "^22.0.1"
+  },
+  "dependencies": {
+    "electron-reload": "^2.0.0-alpha.1",
+    "node-bash": "^5.0.1",
+    "spotify-cli": "^1.0.1"
   }
 }

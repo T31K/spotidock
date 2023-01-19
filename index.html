@@ -1,19 +1,57 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
-    <link href="./styles.css" rel="stylesheet">
-    <title>Hello World!</title>
-  </head>
-  <body>
-    <h1>Hello World!</h1>
-    We are using Node.js <span id="node-version"></span>,
-    Chromium <span id="chrome-version"></span>,
-    and Electron <span id="electron-version"></span>.
+<html lang="en">
 
-    <!-- You can also require other files to run in this process -->
-    <script src="./renderer.js"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="./styles.css">
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+</head>
+
+<body>
+  <div id="main">
+    <div class="left">
+      <img id="track-img" src="https://i.scdn.co/image/ab67616d0000b273180ce24b90121032a5eb18e8" alt="">
+      <div class="inner-left">
+        <h4 class="titlebar" id="track-name">loading...</h4>
+        <p id="track-artist">loading...</p>
+      </div>
+      <div class="fav-box">
+        <i class='bx bxs-heart'></i>
+
+      </div>
+
+    </div>
+    <div class="mid">
+      <i class='bx bx-shuffle'></i>
+      <i class='bx bx-skip-previous'></i>
+      <div id="playpausecontainer">
+        <i class='bx bx-play' id="playpause"></i>
+      </div>
+      <i class='bx bx-skip-next'></i>
+      <i class='bx bx-repeat'></i>
+    </div>
+    <div class="right">
+      <i class='bx bxl-spotify'></i>
+      <i class='bx bx-toggle-left'></i>
+    </div>
+  </div>
+  <script src=" ./jquery-min.js"></script>
+  <script src=" ./renderer.js"></script>
+  <script src="./script.js""></script>
+</body>
+
 </html>
+<!-- launch get all states -->
+<!-- name,artist -->
+<!-- play/pause state -->
+<!-- shuffle state -->
+<!-- replay state -->
+
+<!-- on next, get track name-->
+<!-- on previous, get track name-->
+<!-- on shuffle, get state -->
+<!-- on replay, get state -->

@@ -1,43 +1,130 @@
-// Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron')
-const path = require('path')
+const { app, BrowserWindow, globalShortcut, screen, ipcMain } = require('electron');
+const path = require('path');
 
-function createWindow () {
-  // Create the browser window.
-  const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+const { Bash } = require('node-bash');
+
+let mainWindow;
+function createWindow() {
+  mainWindow = new BrowserWindow({
+    transparent: true,
+    x: 140,
+    y: 2000,
+    width: 1150,
+    height: 85,
+    frame: false,
+    alwaysOnTop: true,
+    resizable: false,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
-    }
-  })
-
-  // and load the index.html of the app.
-  mainWindow.loadFile('index.html')
-
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+      nodeIntegration: true,
+      preload: path.join(__dirname, 'preload.js'),
+    },
+  });
+  mainWindow.loadFile('index.html');
+  mainWindow.hide();
+  mainWindow.webContents.openDevTools();
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
-  createWindow()
+let settingsWindow;
+function createSettings() {
+  settingsWindow = new BrowserWindow({
+    width: 400,
+    height: 260,
+    resizable: false,
+    webPreferences: {
+      nodeIntegration: true,
+      preload: path.join(__dirname, 'preload.js'),
+    },
+  });
+  settingsWindow.loadFile('settings.html');
+  settingsWindow.webContents.openDevTools();
+}
 
+app.whenReady().then(() => {
+  let mainScreen = screen.getPrimaryDisplay();
+  let height = mainScreen.size.height;
+  let width = mainScreen.size.width;
+
+  createWindow();
+  mainWindow.setPosition((width - 1150) / 2, height + 1000);
+  console.log(width - 1150);
+  globalShortcut.register('CommandOrControl+`', async () => {
+    if (mainWindow.isVisible()) {
+      // Hide the window
+      mainWindow.webContents.send('mainChannel', { command: 'scrollDown' });
+      await delay(500);
+      mainWindow.hide();
+      clearInterval(getTrackInterval);
+      Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to false'`;
+    } else {
+      // Show the window
+      await Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to true'`;
+      await delay(200);
+      await mainWindow.show();
+      await delay(200);
+      mainWindow.webContents.send('mainChannel', { command: 'scrollUp' });
+      getTrackInterval = setInterval(() => getTrack(), 500);
+    }
+  });
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  })
-})
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  });
+});
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
 app.on('window-all-closed', function () {
-  if (process.platform !== 'darwin') app.quit()
-})
+  if (process.platform !== 'darwin') app.quit();
+});
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
+var getTrackInterval;
+ipcMain.on('mainChannel', async (event, arg) => {
+  let { command } = arg;
+  console.log(command);
+  switch (command) {
+    case 'previous':
+      Bash.$`osascript -e 'tell application "Spotify" to previous track'`;
+      await delay(500);
+      getTrack();
+      break;
+    case 'next':
+      Bash.$`osascript -e 'tell application "Spotify" to next track'`;
+      await delay(500);
+      getTrack();
+      break;
+    case 'play':
+      Bash.$`osascript -e 'tell application "Spotify" to playpause'`;
+      break;
+    case 'toggle':
+      mainWindow.webContents.send('mainChannel', { command: 'scrollDown' });
+      await delay(500);
+      mainWindow.hide();
+      Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to false'`;
+      break;
+    case 'spotify':
+      Bash.$`open -a Spotify`;
+      break;
+  }
+});
+
+async function getTrack() {
+  let name = await Bash.$`osascript -e 'tell application "Spotify" to name of current track'`;
+  let artist = await Bash.$`osascript -e 'tell application "Spotify" to artist of current track'`;
+  let url = await Bash.$`osascript -e 'tell application "Spotify" to artwork url of current track'`;
+  let repeat = await Bash.$`osascript -e 'tell application "Spotify" to repeating'`;
+  let shuffle = await Bash.$`osascript -e 'tell application "Spotify" to shuffling'`;
+  let status = await Bash.$`osascript -e 'tell application "Spotify" to player state'`;
+  await mainWindow.webContents.send('mainChannel', {
+    command: 'updateTrack',
+    data: {
+      name: name.raw,
+      artist: artist.raw,
+      url: url.raw,
+      repeat: repeat.raw,
+      shuffle: shuffle.raw,
+      status: status.raw,
+    },
+  });
+}
+
+const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
+app.dock.hide();
