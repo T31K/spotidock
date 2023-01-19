@@ -20,9 +20,10 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     }
   },
   receive: (channel, func) => {
-    let validChannels = ['mainChannel']; // <-- Array of all ipcMain Channels used in the electron
+    // Array of all ipcMain Channels used in the electron
+    let validChannels = ['mainChannel'];
     if (validChannels.includes(channel)) {
-      // Deliberately strip event as it includes `sender`
+      // Strip event as it includes `sender`
       ipcRenderer.on(channel, (event, ...args) => func(...args));
     }
   },
