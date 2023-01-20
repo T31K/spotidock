@@ -1,13 +1,19 @@
+let trackName = $('#track-name');
+let trackArtist = $('#track-artist');
+let trackImg = $('#track-img');
+let playPause = $('#playpause');
+let main = $('#main');
+
 ipcRenderer.receive('mainChannel', (res) => {
   let { command, data } = res;
   if (command === 'updateTrack') {
     updateTrack(data);
   }
   if (command === 'scrollUp') {
-    $('#main').addClass('active');
+    main.addClass('active');
   }
   if (command === 'scrollDown') {
-    $('#main').removeClass('active');
+    main.removeClass('active');
   }
 });
 console.log('run');
