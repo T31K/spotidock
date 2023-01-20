@@ -10,7 +10,7 @@ ipcRenderer.receive('mainChannel', (res) => {
     $('#main').removeClass('active');
   }
 });
-
+console.log('run');
 function updateTrack({ name, artist, url, repeat, shuffle, status }) {
   $('#track-name').text(name);
   $('#track-artist').text(artist);
