@@ -1,4 +1,5 @@
 const { ipcRenderer, contextBridge } = require('electron');
+
 window.addEventListener('DOMContentLoaded', () => {
   const replaceText = (selector, text) => {
     const element = document.getElementById(selector);
@@ -13,16 +14,16 @@ window.addEventListener('DOMContentLoaded', () => {
 contextBridge.exposeInMainWorld('ipcRenderer', {
   send: (channel, data) => {
     // Array of all ipcRenderer Channels used in the client
+    let validChannels = ['mainChannel'];
     if (validChannels.includes(channel)) {
-      let validChannels = ['mainChannel'];
       ipcRenderer.send(channel, data);
     }
   },
   receive: (channel, func) => {
-    // Array of all ipcMain Channels used in the electron
+    //  Array of all ipcMain Channels used in the electron
     let validChannels = ['mainChannel'];
     if (validChannels.includes(channel)) {
-      // Strip event as it includes `sender`
+      // Deliberately strip event as it includes `sender`
       ipcRenderer.on(channel, (event, ...args) => func(...args));
     }
   },

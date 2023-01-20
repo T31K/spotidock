@@ -60,7 +60,6 @@ var getTrackInterval;
 ipcMain.on('mainChannel', async (event, arg) => {
   console.log(event);
   let { command } = arg;
-  console.log(command);
   switch (command) {
     case 'previous':
       Bash.$`osascript -e 'tell application "Spotify" to previous track'`;
