@@ -58,7 +58,6 @@ app.on('before-quit', () => {
 
 var getTrackInterval;
 ipcMain.on('mainChannel', async (event, arg) => {
-  console.log(event);
   let { command } = arg;
   switch (command) {
     case 'previous':
