@@ -47,6 +47,7 @@ app.whenReady().then(() => {
   createWindow();
   mainWindow.setPosition((width - 1150) / 2, height + 1000);
   console.log(width - 1150);
+  console.log('hello');
   globalShortcut.register('CommandOrControl+`', async () => {
     if (mainWindow.isVisible()) {
       // Hide the window
