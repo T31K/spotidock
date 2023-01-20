@@ -41,8 +41,8 @@ $('.bx-shuffle').on('click', () => {
 $('.bx-skip-previous').on('click', () => {
   sendMessage('previous');
 });
-$('#playpause').on('click', () => {
-  $('#playpause').toggleClass('bx-play bx-pause');
+playPause.on('click', () => {
+  playPause.toggleClass('bx-play bx-pause');
   sendMessage('play');
 });
 $('.bx-skip-next').on('click', () => {
