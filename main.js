@@ -47,17 +47,6 @@ app.whenReady().then(() => {
   createWindow();
   setWindowPos();
   setUpGlobals();
-  // app.on('activate', function () {
-  //   if (BrowserWindow.getAllWindows().length === 0) createWindow();
-  // });
-});
-
-app.on('window-all-closed', function () {
-  if (process.platform !== 'darwin') app.quit();
-});
-
-app.on('before-quit', () => {
-  Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to false'`;
 });
 
 ipcMain.on('mainChannel', async (event, arg) => {
@@ -131,6 +120,16 @@ function setUpGlobals() {
       mainWindow.webContents.send('mainChannel', { command: 'scrollUp' });
       getTrackInterval = setInterval(() => getTrack(), 500);
     }
+  });
+}
+
+function beforeQuitHooks() {
+  app.on('window-all-closed', function () {
+    if (process.platform !== 'darwin') app.quit();
+  });
+
+  app.on('before-quit', () => {
+    Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to false'`;
   });
 }
 
