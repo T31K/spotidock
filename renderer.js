@@ -16,15 +16,15 @@ ipcRenderer.receive('mainChannel', (res) => {
     main.removeClass('active');
   }
 });
-console.log('run');
+
 function updateTrack({ name, artist, url, repeat, shuffle, status }) {
-  $('#track-name').text(name);
-  $('#track-artist').text(artist);
-  $('#track-img').attr('src', url);
+  trackName.text(name);
+  trackArtist.text(artist);
+  trackImg.attr('src', url);
   if (status === 'playing') {
-    $('#playpause').attr('class', 'bx bx-pause');
+    playPause.attr('class', 'bx bx-pause');
   } else if (status === 'paused') {
-    $('#playpause').attr('class', 'bx bx-play');
+    playPause.attr('class', 'bx bx-play');
   }
 }
 
