@@ -3,7 +3,12 @@ const path = require('path');
 
 const { Bash } = require('node-bash');
 
+// Globals
 let mainWindow;
+let settingsWindow;
+var getTrackInterval;
+app.dock.hide();
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     transparent: true,
@@ -24,7 +29,6 @@ function createWindow() {
   mainWindow.webContents.openDevTools();
 }
 
-let settingsWindow;
 function createSettings() {
   settingsWindow = new BrowserWindow({
     width: 400,
@@ -56,7 +60,6 @@ app.on('before-quit', () => {
   Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to false'`;
 });
 
-var getTrackInterval;
 ipcMain.on('mainChannel', async (event, arg) => {
   let { command } = arg;
   switch (command) {
@@ -81,6 +84,8 @@ ipcMain.on('mainChannel', async (event, arg) => {
   }
 });
 
+// Helpers
+
 async function getTrack() {
   let name = await Bash.$`osascript -e 'tell application "Spotify" to name of current track'`;
   let artist = await Bash.$`osascript -e 'tell application "Spotify" to artist of current track'`;
@@ -100,9 +105,6 @@ async function getTrack() {
     },
   });
 }
-
-const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
-app.dock.hide();
 
 function setWindowPos() {
   let mainScreen = screen.getPrimaryDisplay();
@@ -129,5 +131,11 @@ function setUpGlobals() {
       mainWindow.webContents.send('mainChannel', { command: 'scrollUp' });
       getTrackInterval = setInterval(() => getTrack(), 500);
     }
+  });
+}
+
+function delay(time) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, time);
   });
 }
