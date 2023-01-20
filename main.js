@@ -40,32 +40,9 @@ function createSettings() {
 }
 
 app.whenReady().then(() => {
-  let mainScreen = screen.getPrimaryDisplay();
-  let height = mainScreen.size.height;
-  let width = mainScreen.size.width;
-
   createWindow();
-  mainWindow.setPosition((width - 1150) / 2, height + 1000);
-  console.log(width - 1150);
-  console.log('hello');
-  globalShortcut.register('CommandOrControl+`', async () => {
-    if (mainWindow.isVisible()) {
-      // Hide the window
-      mainWindow.webContents.send('mainChannel', { command: 'scrollDown' });
-      await delay(500);
-      mainWindow.hide();
-      clearInterval(getTrackInterval);
-      Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to false'`;
-    } else {
-      // Show the window
-      await Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to true'`;
-      await delay(200);
-      await mainWindow.show();
-      await delay(200);
-      mainWindow.webContents.send('mainChannel', { command: 'scrollUp' });
-      getTrackInterval = setInterval(() => getTrack(), 500);
-    }
-  });
+  setWindowPos();
+
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
@@ -128,3 +105,31 @@ async function getTrack() {
 
 const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
 app.dock.hide();
+
+function setWindowPos() {
+  let mainScreen = screen.getPrimaryDisplay();
+  let height = mainScreen.size.height;
+  let width = mainScreen.size.width;
+  mainWindow.setPosition((width - 1150) / 2, height + 1000);
+}
+
+function setUpGlobals() {
+  globalShortcut.register('CommandOrControl+`', async () => {
+    if (mainWindow.isVisible()) {
+      // Hide the window
+      mainWindow.webContents.send('mainChannel', { command: 'scrollDown' });
+      await delay(500);
+      mainWindow.hide();
+      clearInterval(getTrackInterval);
+      Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to false'`;
+    } else {
+      // Show the window
+      await Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to true'`;
+      await delay(200);
+      await mainWindow.show();
+      await delay(200);
+      mainWindow.webContents.send('mainChannel', { command: 'scrollUp' });
+      getTrackInterval = setInterval(() => getTrack(), 500);
+    }
+  });
+}
