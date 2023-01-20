@@ -42,10 +42,10 @@ function createSettings() {
 app.whenReady().then(() => {
   createWindow();
   setWindowPos();
-
-  app.on('activate', function () {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
-  });
+  setUpGlobals();
+  // app.on('activate', function () {
+  //   if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  // });
 });
 
 app.on('window-all-closed', function () {
