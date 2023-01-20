@@ -79,32 +79,31 @@ app.on('before-quit', () => {
 });
 
 var getTrackInterval;
-function setUpIPC() {
-  ipcMain.on('mainChannel', async (event, arg) => {
-    let { command } = arg;
-    console.log(command);
-    switch (command) {
-      case 'previous':
-        Bash.$`osascript -e 'tell application "Spotify" to previous track'`;
-        break;
-      case 'next':
-        Bash.$`osascript -e 'tell application "Spotify" to next track'`;
-        break;
-      case 'play':
-        Bash.$`osascript -e 'tell application "Spotify" to playpause'`;
-        break;
-      case 'toggle':
-        mainWindow.webContents.send('mainChannel', { command: 'scrollDown' });
-        await delay(500);
-        mainWindow.hide();
-        Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to false'`;
-        break;
-      case 'spotify':
-        Bash.$`open -a Spotify`;
-        break;
-    }
-  });
-}
+ipcMain.on('mainChannel', async (event, arg) => {
+  console.log(event);
+  let { command } = arg;
+  console.log(command);
+  switch (command) {
+    case 'previous':
+      Bash.$`osascript -e 'tell application "Spotify" to previous track'`;
+      break;
+    case 'next':
+      Bash.$`osascript -e 'tell application "Spotify" to next track'`;
+      break;
+    case 'play':
+      Bash.$`osascript -e 'tell application "Spotify" to playpause'`;
+      break;
+    case 'toggle':
+      mainWindow.webContents.send('mainChannel', { command: 'scrollDown' });
+      await delay(500);
+      mainWindow.hide();
+      Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to false'`;
+      break;
+    case 'spotify':
+      Bash.$`open -a Spotify`;
+      break;
+  }
+});
 
 async function getTrack() {
   let name = await Bash.$`osascript -e 'tell application "Spotify" to name of current track'`;
