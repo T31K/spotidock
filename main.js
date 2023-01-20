@@ -85,13 +85,9 @@ ipcMain.on('mainChannel', async (event, arg) => {
   switch (command) {
     case 'previous':
       Bash.$`osascript -e 'tell application "Spotify" to previous track'`;
-      await delay(500);
-      getTrack();
       break;
     case 'next':
       Bash.$`osascript -e 'tell application "Spotify" to next track'`;
-      await delay(500);
-      getTrack();
       break;
     case 'play':
       Bash.$`osascript -e 'tell application "Spotify" to playpause'`;
