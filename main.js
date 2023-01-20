@@ -1,7 +1,6 @@
 const { app, BrowserWindow, globalShortcut, screen, ipcMain } = require('electron');
-const path = require('path');
-
 const { Bash } = require('node-bash');
+const path = require('path');
 
 // Globals
 let mainWindow;
@@ -9,6 +8,7 @@ let settingsWindow;
 var getTrackInterval;
 app.dock.hide();
 
+// Windows creation
 function createWindow() {
   mainWindow = new BrowserWindow({
     transparent: true,
@@ -43,38 +43,15 @@ function createSettings() {
   settingsWindow.webContents.openDevTools();
 }
 
+// App initialization
 app.whenReady().then(() => {
   createWindow();
   setWindowPos();
   setUpGlobals();
-});
-
-ipcMain.on('mainChannel', async (event, arg) => {
-  let { command } = arg;
-  switch (command) {
-    case 'previous':
-      Bash.$`osascript -e 'tell application "Spotify" to previous track'`;
-      break;
-    case 'next':
-      Bash.$`osascript -e 'tell application "Spotify" to next track'`;
-      break;
-    case 'play':
-      Bash.$`osascript -e 'tell application "Spotify" to playpause'`;
-      break;
-    case 'toggle':
-      mainWindow.webContents.send('mainChannel', { command: 'scrollDown' });
-      await delay(500);
-      mainWindow.hide();
-      Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to false'`;
-      break;
-    case 'spotify':
-      Bash.$`open -a Spotify`;
-      break;
-  }
+  setUpListener();
 });
 
 // Helpers
-
 async function getTrack() {
   let name = await Bash.$`osascript -e 'tell application "Spotify" to name of current track'`;
   let artist = await Bash.$`osascript -e 'tell application "Spotify" to artist of current track'`;
@@ -123,6 +100,31 @@ function setUpGlobals() {
   });
 }
 
+function setUpListener() {
+  ipcMain.on('mainChannel', async (event, arg) => {
+    let { command } = arg;
+    switch (command) {
+      case 'previous':
+        Bash.$`osascript -e 'tell application "Spotify" to previous track'`;
+        break;
+      case 'next':
+        Bash.$`osascript -e 'tell application "Spotify" to next track'`;
+        break;
+      case 'play':
+        Bash.$`osascript -e 'tell application "Spotify" to playpause'`;
+        break;
+      case 'toggle':
+        mainWindow.webContents.send('mainChannel', { command: 'scrollDown' });
+        await delay(500);
+        mainWindow.hide();
+        Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to false'`;
+        break;
+      case 'spotify':
+        Bash.$`open -a Spotify`;
+        break;
+    }
+  });
+}
 function beforeQuitHooks() {
   app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') app.quit();
