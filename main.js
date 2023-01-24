@@ -9,7 +9,7 @@ let settingsWindow;
 let licenseStatus;
 var getTrackInterval;
 app.dock.hide();
-// verifyLicense();
+verifyLicense();
 
 // Windows creation
 function createWindow() {
@@ -60,20 +60,20 @@ function createTrialWindow() {
   trialWindow.webContents.openDevTools();
 }
 
-store.clear();
-// function verifyLicense() {
-//   let license = store.get('license');
+// store.clear();
+function verifyLicense() {
+  let license = store.get('license');
 
-//   if (!license) {
-//     console.log('first launch, no license found');
-//     console.log('creating trial now');
-//     store.set('license', { status: 'trial', date: new Date() });
-//   } else {
-//     let { date } = license;
-//     console.log(date);
-//     console.log('license found');
-//   }
-// }
+  if (!license) {
+    console.log('first launch, no license found');
+    console.log('creating trial now');
+    store.set('license', { type: 'trial', date: new Date(), isValid: true });
+  } else {
+    let { type, date, isValid } = license;
+    console.log(date);
+    console.log('license found');
+  }
+}
 
 // function checkTrialPeriod() {
 //   let firstLaunch = store.get('firstLaunch');
