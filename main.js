@@ -1,6 +1,7 @@
 const { app, BrowserWindow, globalShortcut, screen, ipcMain } = require('electron');
 const { Bash } = require('node-bash');
 const path = require('path');
+const store = new (require('electron-store'))();
 
 // Globals
 let isFirstLaunch = window.localStorage.getItem('firstLaunch');
