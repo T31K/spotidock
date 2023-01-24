@@ -52,21 +52,13 @@ function checkTrialPeriod() {
   if (!firstLaunch) {
     store.set('firstLaunch', today);
   } else {
+    firstLaunch = new Date(firstLaunch);
     const difference = today - firstLaunch;
-    const daysPassed = difference / (1000 * 60 * 60 * 24);
-    console.log(difference, daysPassed);
-    if (!firstLaunch) {
-      store.set('firstLaunch', today);
-      console.log('First launch date:', today);
+    const daysPassed = Math.floor(difference / (1000 * 60 * 60 * 24));
+    if (daysPassed >= 7) {
+      console.log('7 days or more have passed since the first launch.');
     } else {
-      firstLaunch = new Date(firstLaunch);
-      const difference = today - firstLaunch;
-      const daysPassed = Math.floor(difference / (1000 * 60 * 60 * 24));
-      if (daysPassed >= 7) {
-        console.log('7 days or more have passed since the first launch.');
-      } else {
-        console.log(`${daysPassed} days have passed since the first launch.`);
-      }
+      console.log(`${daysPassed} days have passed since the first launch.`);
     }
   }
 }
