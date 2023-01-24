@@ -21,7 +21,6 @@
   },
   "dependencies": {
     "electron-reload": "^2.0.0-alpha.1",
-    "node-bash": "^5.0.1",
-    "spotify-cli": "^1.0.1"
+    "node-bash": "^5.0.1"
   }
 }
