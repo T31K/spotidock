@@ -4,8 +4,8 @@ const path = require('path');
 const store = new (require('electron-store'))();
 
 // Globals
-let isFirstLaunch = window.localStorage.getItem('firstLaunch');
-console.log(isFirstLaunch);
+store.set('unicorn', '🦄');
+console.log(store.get('unicorn'));
 let mainWindow;
 let settingsWindow;
 var getTrackInterval;
