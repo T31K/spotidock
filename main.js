@@ -4,11 +4,10 @@ const path = require('path');
 const store = new (require('electron-store'))();
 
 // Globals
-let firstLaunch = store.get('firstLaunch');
-console.log(firstLaunch);
 let mainWindow;
 let settingsWindow;
 var getTrackInterval;
+let firstLaunch = store.get('firstLaunch');
 app.dock.hide();
 
 // Windows creation
@@ -46,6 +45,20 @@ function createSettings() {
   settingsWindow.webContents.openDevTools();
 }
 
+function checkTrialPeriod() {
+  if (!firstLaunch) {
+    store.set('firstLaunch', today);
+    console.log('First launch date:', today);
+  } else {
+    const difference = today - firstLaunch;
+    const daysPassed = difference / (1000 * 60 * 60 * 24);
+    if (daysPassed >= 7) {
+      console.log('7 days or more have passed since the first launch.');
+    } else {
+      console.log(`${daysPassed} days have passed since the first launch.`);
+    }
+  }
+}
 // App initialization
 app.whenReady().then(() => {
   createWindow();
