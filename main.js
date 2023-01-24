@@ -56,9 +56,9 @@ function checkTrialPeriod() {
     const difference = today - firstLaunch;
     const daysPassed = Math.floor(difference / (1000 * 60 * 60 * 24));
     if (daysPassed >= 7) {
-      console.log('7 days or more have passed since the first launch.');
+      trialPeriod = false;
     } else {
-      console.log(`${daysPassed} days have passed since the first launch.`);
+      trialPeriod = true;
     }
   }
 }
