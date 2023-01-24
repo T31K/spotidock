@@ -6,13 +6,14 @@ const store = new (require('electron-store'))();
 // Globals
 let mainWindow;
 let settingsWindow;
-let licenseStatus;
 var getTrackInterval;
 app.dock.hide();
-verifyLicense();
+// verifyLicense();
+// runFunctionOnceADay();
 
 // Windows creation
 function createWindow() {
+  console.log('createWindow');
   mainWindow = new BrowserWindow({
     transparent: true,
     x: 140,
@@ -174,4 +175,15 @@ function delay(time) {
   return new Promise((resolve) => {
     setTimeout(resolve, time);
   });
+}
+
+function runFunctionOnceADay() {
+  const now = new Date();
+  const nextRun = new Date(now);
+  nextRun.setHours(nextRun.getHours() + 24); // Set the next run time to 24 hours from now
+  const timeUntilNextRun = nextRun - now;
+  setTimeout(() => {
+    verifyLicense();
+    runFunctionOnceADay();
+  }, timeUntilNextRun);
 }
