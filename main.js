@@ -1,3 +1,4 @@
+const { create } = require('domain');
 const { app, BrowserWindow, globalShortcut, screen, ipcMain } = require('electron');
 const { Bash } = require('node-bash');
 const path = require('path');
@@ -6,9 +7,11 @@ const store = new (require('electron-store'))();
 // Globals
 let mainWindow;
 let settingsWindow;
+let trialWindow;
 let trialPeriod;
 var getTrackInterval;
 app.dock.hide();
+checkTrialPeriod();
 
 // Windows creation
 function createWindow() {
@@ -45,6 +48,21 @@ function createSettings() {
   settingsWindow.webContents.openDevTools();
 }
 
+function createTrialWindow() {
+  settingsWindow = new BrowserWindow({
+    width: 400,
+    height: 260,
+    resizable: false,
+    webPreferences: {
+      nodeIntegration: true,
+      preload: path.join(__dirname, 'preload.js'),
+    },
+  });
+  settingsWindow.loadFile('trial.html');
+
+  settingsWindow.webContents.openDevTools();
+}
+
 function checkTrialPeriod() {
   let firstLaunch = store.get('firstLaunch');
   let today = new Date();
@@ -65,11 +83,11 @@ function checkTrialPeriod() {
 
 // App initialization
 app.whenReady().then(() => {
-  checkTrialPeriod();
   createWindow();
   setWindowPos();
   setUpGlobals();
   setUpListener();
+  createTrialWindow();
 });
 
 // Helpers
