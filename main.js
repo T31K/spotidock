@@ -91,13 +91,11 @@ function verifyLicense() {
 
 // App initialization
 app.whenReady().then(() => {
-  if (trialPeriod) {
-    createWindow();
-    setWindowPos();
-    setUpGlobals();
-    setUpListener();
-    createTrialWindow();
-  }
+  createWindow();
+  setWindowPos();
+  setUpGlobals();
+  setUpListener();
+  createTrialWindow();
 });
 
 // Helpers
