@@ -3,6 +3,8 @@ const { Bash } = require('node-bash');
 const path = require('path');
 
 // Globals
+let isFirstLaunch = window.localStorage.getItem('firstLaunch');
+console.log(isFirstLaunch);
 let mainWindow;
 let settingsWindow;
 var getTrackInterval;
