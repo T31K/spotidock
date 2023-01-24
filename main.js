@@ -48,12 +48,13 @@ function createSettings() {
 function checkTrialPeriod() {
   let firstLaunch = store.get('firstLaunch');
   let today = new Date();
-  console.log(today);
+
   if (!firstLaunch) {
     store.set('firstLaunch', today);
   } else {
     const difference = today - firstLaunch;
     const daysPassed = difference / (1000 * 60 * 60 * 24);
+    console.log(difference, daysPassed);
     if (daysPassed >= 7) {
       console.log('7 days or more have passed since the first launch.');
     } else {
