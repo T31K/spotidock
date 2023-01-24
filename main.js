@@ -60,43 +60,21 @@ function createTrialWindow() {
   trialWindow.webContents.openDevTools();
 }
 
-// store.clear();
 function verifyLicense() {
   let license = store.get('license');
 
   if (!license) {
-    console.log('first launch, no license found');
-    console.log('creating trial now');
     store.set('license', { type: 'trial', date: new Date(), isValid: true });
   } else {
     let { type, date, isValid } = license;
     const difference = new Date() - new Date(date);
     const daysPassed = Math.floor(difference / (1000 * 60 * 60 * 24));
     if (daysPassed >= 7) {
-      trialPeriod = false;
-    } else {
-      trialPeriod = true;
+      license.isValid = false;
+      store.set('license', license);
     }
   }
 }
-
-// function checkTrialPeriod() {
-//   let firstLaunch = store.get('firstLaunch');
-//   let today = new Date();
-
-//   if (!firstLaunch) {
-//     store.set('firstLaunch', today);
-//   } else {
-//     firstLaunch = new Date(firstLaunch);
-//     const difference = today - firstLaunch;
-//     const daysPassed = Math.floor(difference / (1000 * 60 * 60 * 24));
-//     if (daysPassed >= 7) {
-//       trialPeriod = false;
-//     } else {
-//       trialPeriod = true;
-//     }
-//   }
-// }
 
 // App initialization
 app.whenReady().then(() => {
