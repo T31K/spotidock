@@ -70,9 +70,13 @@ function verifyLicense() {
     store.set('license', { type: 'trial', date: new Date(), isValid: true });
   } else {
     let { type, date, isValid } = license;
-    const difference = new Date() - date;
+    const difference = new Date() - new Date(date);
     const daysPassed = Math.floor(difference / (1000 * 60 * 60 * 24));
-    console.log(daysPassed);
+    if (daysPassed >= 7) {
+      trialPeriod = false;
+    } else {
+      trialPeriod = true;
+    }
   }
 }
 
