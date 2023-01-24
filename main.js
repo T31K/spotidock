@@ -66,6 +66,7 @@ function verifyLicense() {
   if (!license) {
     console.log('first launch, no license found');
     console.log('creating trial now');
+    store.set('license', { status: 'trial', date: new Date() });
   } else {
     console.log('license found');
   }
