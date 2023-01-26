@@ -9,7 +9,7 @@ let settingsWindow;
 var getTrackInterval;
 let subToken;
 app.dock.hide();
-
+store.clear();
 // Windows creation
 function createDock() {
   mainWindow = new BrowserWindow({
