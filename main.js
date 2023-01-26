@@ -123,6 +123,7 @@ function initDock() {
 
 function initTrial() {
   createTrial();
+  ipcMain.on('mainChannel', async (event, arg) => {});
 }
 
 function setWindowPos() {
