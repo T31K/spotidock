@@ -83,7 +83,6 @@ app.whenReady().then(() => {
   let subToken = store.get('subToken');
 
   if (!subToken) {
-    console.log('here');
     initTrial();
   } else {
     // if (type === 'trial') {
@@ -126,6 +125,7 @@ function initTrial() {
   ipcMain.on('mainChannel', async (event, arg) => {
     let { command } = arg;
 
+    console.log(command);
     if (command === 'generateSubToken') {
       let subToken = { type: 'trial', date: new Date() };
       store.set('subToken', subToken);
