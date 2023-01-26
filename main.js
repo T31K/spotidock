@@ -81,14 +81,7 @@ function generateSubToken() {}
 
 // App initialization
 app.whenReady().then(() => {
-  createTrial();
-
-  if (subToken) {
-    createDock();
-    setWindowPos();
-    setUpGlobals();
-    setUpListener();
-  }
+  let subToken = store.get('subToken');
 });
 
 // Helpers
@@ -110,6 +103,13 @@ async function getTrack() {
       status: status.raw,
     },
   });
+}
+
+function initDock() {
+  createDock();
+  setWindowPos();
+  setUpGlobals();
+  setUpListener();
 }
 
 function setWindowPos() {
