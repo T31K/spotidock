@@ -86,11 +86,10 @@ app.whenReady().then(() => {
     console.log('here');
     initTrial();
   } else {
-    if (type === 'trial') {
-    }
-
-    if (type === 'premium') {
-    }
+    // if (type === 'trial') {
+    // }
+    // if (type === 'premium') {
+    // }
   }
 });
 
