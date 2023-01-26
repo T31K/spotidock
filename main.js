@@ -7,9 +7,10 @@ const store = new (require('electron-store'))();
 let mainWindow;
 let settingsWindow;
 var getTrackInterval;
+let trialReminder = false;
 let subToken;
 app.dock.hide();
-store.clear();
+
 // Windows creation
 function createDock() {
   mainWindow = new BrowserWindow({
@@ -57,9 +58,9 @@ function createTrial() {
   });
   trialWindow.loadFile('trial.html');
   trialWindow.webContents.openDevTools();
+  trialReminder = true;
 }
 
-// Licensing
 function verifyLicense() {
   let license = store.get('license');
 
@@ -80,17 +81,10 @@ function generateSubToken() {}
 
 // App initialization
 app.whenReady().then(() => {
-  let subToken = store.get('subToken');
-
-  if (!subToken) {
-    initTrial();
-  } else {
-    initDock();
-    // if (type === 'trial') {
-    // }
-    // if (type === 'premium') {
-    // }
-  }
+  createDock();
+  setWindowPos();
+  setUpGlobals();
+  setUpListener();
 });
 
 // Helpers
@@ -111,27 +105,6 @@ async function getTrack() {
       shuffle: shuffle.raw,
       status: status.raw,
     },
-  });
-}
-
-function initDock() {
-  createDock();
-  setWindowPos();
-  setUpGlobals();
-  setUpListener();
-}
-
-function initTrial() {
-  createTrial();
-  ipcMain.on('mainChannel', async (event, arg) => {
-    let { command } = arg;
-
-    console.log(command);
-    if (command === 'generateSubToken') {
-      let subToken = { type: 'trial', date: new Date() };
-      store.set('subToken', subToken);
-    }
-    app.relaunch();
   });
 }
 
