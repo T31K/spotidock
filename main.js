@@ -85,6 +85,7 @@ app.whenReady().then(() => {
   if (!subToken) {
     initTrial();
   } else {
+    initDock();
     // if (type === 'trial') {
     // }
     // if (type === 'premium') {
