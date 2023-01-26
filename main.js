@@ -7,7 +7,6 @@ const store = new (require('electron-store'))();
 let mainWindow;
 let settingsWindow;
 var getTrackInterval;
-let trialReminder = false;
 let subToken;
 app.dock.hide();
 
@@ -58,7 +57,6 @@ function createTrial() {
   });
   trialWindow.loadFile('trial.html');
   trialWindow.webContents.openDevTools();
-  trialReminder = true;
 }
 
 // Licensing
@@ -83,9 +81,9 @@ function generateSubToken() {}
 // App initialization
 app.whenReady().then(() => {
   let subToken = store.get('subToken');
-  let { type, date } = subToken;
 
   if (!subToken) {
+    initTrial();
   } else {
     if (type === 'trial') {
     }
