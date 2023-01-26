@@ -1,4 +1,4 @@
-const { app, BrowserWindow, globalShortcut, screen, ipcMain } = require('electron');
+const { app, BrowserWindow, globalShortcut, screen, ipcMain, powerMonitor } = require('electron');
 const { Bash } = require('node-bash');
 const path = require('path');
 const store = new (require('electron-store'))();
@@ -7,13 +7,12 @@ const store = new (require('electron-store'))();
 let mainWindow;
 let settingsWindow;
 var getTrackInterval;
+let trialReminder = false;
+let subToken;
 app.dock.hide();
-// verifyLicense();
-// runFunctionOnceADay();
 
 // Windows creation
-function createWindow() {
-  console.log('createWindow');
+function createDock() {
   mainWindow = new BrowserWindow({
     transparent: true,
     x: 140,
@@ -47,7 +46,7 @@ function createSettings() {
   settingsWindow.webContents.openDevTools();
 }
 
-function createTrialWindow() {
+function createTrial() {
   trialWindow = new BrowserWindow({
     width: 400,
     height: 260,
@@ -59,6 +58,7 @@ function createTrialWindow() {
   });
   trialWindow.loadFile('trial.html');
   trialWindow.webContents.openDevTools();
+  trialReminder = true;
 }
 
 function verifyLicense() {
@@ -77,13 +77,18 @@ function verifyLicense() {
   }
 }
 
+function generateSubToken() {}
+
 // App initialization
 app.whenReady().then(() => {
-  createWindow();
-  setWindowPos();
-  setUpGlobals();
-  setUpListener();
-  createTrialWindow();
+  createTrial();
+
+  if (subToken) {
+    createDock();
+    setWindowPos();
+    setUpGlobals();
+    setUpListener();
+  }
 });
 
 // Helpers
@@ -161,8 +166,8 @@ function setUpListener() {
   });
 }
 
-function beforeQuitHooks() {
-  app.on('window-all-closed', function () {
+function setUpHooks() {
+  app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
   });
 
@@ -175,15 +180,4 @@ function delay(time) {
   return new Promise((resolve) => {
     setTimeout(resolve, time);
   });
-}
-
-function runFunctionOnceADay() {
-  const now = new Date();
-  const nextRun = new Date(now);
-  nextRun.setHours(nextRun.getHours() + 24); // Set the next run time to 24 hours from now
-  const timeUntilNextRun = nextRun - now;
-  setTimeout(() => {
-    verifyLicense();
-    runFunctionOnceADay();
-  }, timeUntilNextRun);
 }
