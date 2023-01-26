@@ -61,6 +61,7 @@ function createTrial() {
   trialReminder = true;
 }
 
+// Licensing
 function verifyLicense() {
   let license = store.get('license');
 
@@ -82,6 +83,16 @@ function generateSubToken() {}
 // App initialization
 app.whenReady().then(() => {
   let subToken = store.get('subToken');
+  let { type, date } = subToken;
+
+  if (!subToken) {
+  } else {
+    if (type === 'trial') {
+    }
+
+    if (type === 'premium') {
+    }
+  }
 });
 
 // Helpers
@@ -110,6 +121,10 @@ function initDock() {
   setWindowPos();
   setUpGlobals();
   setUpListener();
+}
+
+function initTrial() {
+  createTrial();
 }
 
 function setWindowPos() {
