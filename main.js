@@ -7,9 +7,8 @@ const store = new (require('electron-store'))();
 let mainWindow;
 let settingsWindow;
 var getTrackInterval;
-let trialReminder = false;
-let subToken;
 app.dock.hide();
+store.clear();
 
 // Windows creation
 function createDock() {
@@ -77,14 +76,24 @@ function verifyLicense() {
   }
 }
 
-function generateSubToken() {}
+function generateSubToken() {
+  let subToken = store.get('subToken');
+  if (!subToken) {
+    store.set('subToken', { type: 'trial', date: new Date(), valid: true });
+  }
+}
 
 // App initialization
 app.whenReady().then(() => {
-  createDock();
-  setWindowPos();
-  setUpGlobals();
-  setUpListener();
+  let subToken = store.get('subToken');
+  if (subToken.valid) {
+    console.log('valid subToken');
+    createDock();
+    setWindowPos();
+    setUpGlobals();
+    setUpListener();
+  } else {
+  }
 });
 
 // Helpers
