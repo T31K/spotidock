@@ -83,6 +83,7 @@ app.whenReady().then(() => {
   let subToken = store.get('subToken');
 
   if (!subToken) {
+    console.log('here');
     initTrial();
   } else {
     if (type === 'trial') {
@@ -123,7 +124,15 @@ function initDock() {
 
 function initTrial() {
   createTrial();
-  ipcMain.on('mainChannel', async (event, arg) => {});
+  ipcMain.on('mainChannel', async (event, arg) => {
+    let { command } = arg;
+
+    if (command === 'generateSubToken') {
+      let subToken = { type: 'trial', date: new Date() };
+      store.set('subToken', subToken);
+    }
+    app.relaunch();
+  });
 }
 
 function setWindowPos() {
