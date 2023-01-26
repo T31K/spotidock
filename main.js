@@ -85,15 +85,10 @@ function generateSubToken() {
 
 // App initialization
 app.whenReady().then(() => {
-  let subToken = store.get('subToken');
-  if (subToken.valid) {
-    console.log('valid subToken');
-    createDock();
-    setWindowPos();
-    setUpGlobals();
-    setUpListener();
-  } else {
-  }
+  createDock();
+  setWindowPos();
+  setUpGlobals();
+  setUpListener();
 });
 
 // Helpers
