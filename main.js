@@ -1,4 +1,4 @@
-const { app, BrowserWindow, globalShortcut, screen, ipcMain, powerMonitor } = require('electron');
+const { app, BrowserWindow, globalShortcut, screen, ipcMain, powerMonitor, Notification } = require('electron');
 const { Bash } = require('node-bash');
 const path = require('path');
 const store = new (require('electron-store'))();
@@ -9,6 +9,8 @@ let settingsWindow;
 var getTrackInterval;
 app.dock.hide();
 store.clear();
+let subToken = store.get('subToken');
+if (!subToken) setUpSubToken();
 
 // Windows creation
 function createDock() {
@@ -28,7 +30,6 @@ function createDock() {
   });
   mainWindow.loadFile('index.html');
   mainWindow.hide();
-  mainWindow.webContents.openDevTools();
 }
 
 function createSettings() {
@@ -56,39 +57,29 @@ function createTrial() {
     },
   });
   trialWindow.loadFile('trial.html');
+  trialWindow.hide();
+  trialWindow.on('close', (e) => {
+    e.preventDefault();
+    trialWindow.hide();
+  });
   trialWindow.webContents.openDevTools();
-  trialReminder = true;
-}
-
-function verifyLicense() {
-  let license = store.get('license');
-
-  if (!license) {
-    store.set('license', { type: 'trial', date: new Date(), isValid: true });
-  } else {
-    let { type, date, isValid } = license;
-    const difference = new Date() - new Date(date);
-    const daysPassed = Math.floor(difference / (1000 * 60 * 60 * 24));
-    if (daysPassed >= 7) {
-      license.isValid = false;
-      store.set('license', license);
-    }
-  }
-}
-
-function generateSubToken() {
-  let subToken = store.get('subToken');
-  if (!subToken) {
-    store.set('subToken', { type: 'trial', date: new Date(), valid: true });
-  }
 }
 
 // App initialization
-app.whenReady().then(() => {
-  createDock();
-  setWindowPos();
-  setUpGlobals();
-  setUpListener();
+app.whenReady().then(async () => {
+  let subToken = store.get('subToken');
+  let today = new Date();
+  let expire = new Date(subToken.expire);
+
+  if (subToken.type === 'trial' && today.getTime() < expire.getTime()) {
+    createTrial();
+    createDock();
+    setWindowPos();
+    setUpGlobals();
+    setUpListener();
+  } else {
+    trialWindow.show();
+  }
 });
 
 // Helpers
@@ -162,6 +153,9 @@ function setUpListener() {
       case 'spotify':
         Bash.$`open -a Spotify`;
         break;
+      case 'settings':
+        trialWindow.show();
+        break;
     }
   });
 }
@@ -176,6 +170,12 @@ function setUpHooks() {
   });
 }
 
+function setUpSubToken() {
+  let today = new Date();
+  let sevenDaysLater = new Date(today);
+  sevenDaysLater.setDate(sevenDaysLater.getDate() + 7);
+  store.set('subToken', { type: 'trial', date: today, expire: sevenDaysLater });
+}
 function delay(time) {
   return new Promise((resolve) => {
     setTimeout(resolve, time);

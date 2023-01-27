@@ -58,3 +58,7 @@ $('.bx-toggle-left').on('click', () => {
 $('.bxl-spotify').on('click', () => {
   sendMessage('spotify');
 });
+
+$('.bxs-cog').on('click', () => {
+  sendMessage('settings');
+});
