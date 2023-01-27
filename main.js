@@ -71,7 +71,7 @@ app.whenReady().then(async () => {
   let today = new Date();
   let expire = new Date(subToken.expire);
 
-  if (subToken.type === 'trial' && today.getTime() < expire.getTime()) {
+  if (subToken.type === 'trial' && today.getTime() < expire.getTime() && subToken.valid) {
     createTrial();
     createDock();
     setWindowPos();
@@ -174,7 +174,7 @@ function setUpSubToken() {
   let today = new Date();
   let sevenDaysLater = new Date(today);
   sevenDaysLater.setDate(sevenDaysLater.getDate() + 7);
-  store.set('subToken', { type: 'trial', date: today, expire: sevenDaysLater });
+  store.set('subToken', { type: 'trial', date: today, expire: sevenDaysLater, valid: true });
 }
 function delay(time) {
   return new Promise((resolve) => {
