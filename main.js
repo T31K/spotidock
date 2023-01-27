@@ -169,10 +169,6 @@ function setUpHooks() {
   app.on('before-quit', () => {
     Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to false'`;
   });
-
-  powerMonitor.on('resume', () => {
-    console.log('yes');
-  });
 }
 
 function setUpSubToken() {
@@ -180,7 +176,6 @@ function setUpSubToken() {
   let sevenDaysLater = new Date(today);
   sevenDaysLater.setDate(sevenDaysLater.getDate() + 7);
   store.set('subToken', { type: 'trial', date: today, expire: sevenDaysLater, valid: true });
-  console.log(store.get('subToken'));
 }
 function delay(time) {
   return new Promise((resolve) => {
