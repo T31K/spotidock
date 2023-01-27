@@ -11,6 +11,7 @@ app.dock.hide();
 store.clear();
 let subToken = store.get('subToken');
 if (!subToken) setUpSubToken();
+setUpHooks();
 
 // Windows creation
 function createDock() {
