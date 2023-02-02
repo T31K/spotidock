@@ -22,9 +22,9 @@ function updateTrack({ name, artist, url, repeat, shuffle, status }) {
   trackArtist.text(artist);
   trackImg.attr('src', url);
   if (status === 'playing') {
-    playPause.attr('class', 'bx bx-pause');
+    playPause.attr('class', 'bi bi-pause-circle-fill');
   } else if (status === 'paused') {
-    playPause.attr('class', 'bx bx-play');
+    playPause.attr('class', 'bi bi-play-circle-fill');
   }
 }
 
@@ -42,7 +42,6 @@ $('.bx-skip-previous').on('click', () => {
   sendMessage('previous');
 });
 playPause.on('click', () => {
-  playPause.toggleClass('bx-play bx-pause');
   sendMessage('play');
 });
 $('.bx-skip-next').on('click', () => {

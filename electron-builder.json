@@ -1,0 +1,13 @@
+{
+  "appId": "com.docktopus",
+  "productName": "Docktopus",
+  "directories": {
+    "output": "build"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "mac": {
+    "target": "dmg"
+  }
+}

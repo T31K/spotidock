@@ -1,11 +1,11 @@
 {
-  "name": "electron-quick-start",
-  "version": "1.0.0",
+  "name": "Docktopus",
+  "version": "1.0.0-beta.1",
   "description": "A minimal Electron application",
-  "main": "main.js",
   "scripts": {
     "start": "electron ."
   },
+  "main": "main.js",
   "repository": "https://github.com/electron/electron-quick-start",
   "keywords": [
     "Electron",
@@ -14,10 +14,16 @@
     "tutorial",
     "demo"
   ],
+  "build": {
+    "extends": null,
+    "prune": true,
+    "compression": "maximum"
+  },
   "author": "T31K",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^22.0.1"
+    "electron": "^22.0.1",
+    "electron-builder": "^23.6.0"
   },
   "dependencies": {
     "electron-store": "^8.1.0",

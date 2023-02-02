@@ -7,8 +7,8 @@ const store = new (require('electron-store'))();
 let mainWindow;
 let settingsWindow;
 var getTrackInterval;
+let activateEnabled = true;
 app.dock.hide();
-store.clear();
 let subToken = store.get('subToken');
 if (!subToken) setUpSubToken();
 setUpHooks();
@@ -17,12 +17,12 @@ setUpHooks();
 function createDock() {
   mainWindow = new BrowserWindow({
     transparent: true,
+    alwaysOnTop: true,
     x: 140,
     y: 2000,
     width: 1150,
     height: 85,
     frame: false,
-    alwaysOnTop: true,
     resizable: false,
     webPreferences: {
       nodeIntegration: true,
@@ -31,6 +31,7 @@ function createDock() {
   });
   mainWindow.loadFile('index.html');
   mainWindow.hide();
+  mainWindow.setVisibleOnAllWorkspaces(true);
 }
 
 function createSettings() {
@@ -44,7 +45,7 @@ function createSettings() {
     },
   });
   settingsWindow.loadFile('settings.html');
-  settingsWindow.webContents.openDevTools();
+  // settingsWindow.webContents.openDevTools();
 }
 
 function createTrial() {
@@ -63,7 +64,7 @@ function createTrial() {
     e.preventDefault();
     trialWindow.hide();
   });
-  trialWindow.webContents.openDevTools();
+  // trialWindow.webContents.openDevTools();
 }
 
 // App initialization
@@ -85,23 +86,27 @@ app.whenReady().then(async () => {
 
 // Helpers
 async function getTrack() {
-  let name = await Bash.$`osascript -e 'tell application "Spotify" to name of current track'`;
-  let artist = await Bash.$`osascript -e 'tell application "Spotify" to artist of current track'`;
-  let url = await Bash.$`osascript -e 'tell application "Spotify" to artwork url of current track'`;
-  let repeat = await Bash.$`osascript -e 'tell application "Spotify" to repeating'`;
-  let shuffle = await Bash.$`osascript -e 'tell application "Spotify" to shuffling'`;
-  let status = await Bash.$`osascript -e 'tell application "Spotify" to player state'`;
-  await mainWindow.webContents.send('mainChannel', {
-    command: 'updateTrack',
-    data: {
-      name: name.raw,
-      artist: artist.raw,
-      url: url.raw,
-      repeat: repeat.raw,
-      shuffle: shuffle.raw,
-      status: status.raw,
-    },
-  });
+  try {
+    let name = await Bash.$`osascript -e 'tell application "Spotify" to name of current track'`;
+    let artist = await Bash.$`osascript -e 'tell application "Spotify" to artist of current track'`;
+    let url = await Bash.$`osascript -e 'tell application "Spotify" to artwork url of current track'`;
+    let repeat = await Bash.$`osascript -e 'tell application "Spotify" to repeating'`;
+    let shuffle = await Bash.$`osascript -e 'tell application "Spotify" to shuffling'`;
+    let status = await Bash.$`osascript -e 'tell application "Spotify" to player state'`;
+    await mainWindow.webContents.send('mainChannel', {
+      command: 'updateTrack',
+      data: {
+        name: name.raw,
+        artist: artist.raw,
+        url: url.raw,
+        repeat: repeat.raw,
+        shuffle: shuffle.raw,
+        status: status.raw,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 function setWindowPos() {
@@ -109,6 +114,10 @@ function setWindowPos() {
   let height = mainScreen.size.height;
   let width = mainScreen.size.width;
   mainWindow.setPosition((width - 1150) / 2, height + 1000);
+  screen.on('swipe', (event) => {
+    console.log(event);
+    // code to handle the swipe event
+  });
 }
 
 function setUpGlobals() {
@@ -120,6 +129,7 @@ function setUpGlobals() {
       mainWindow.hide();
       clearInterval(getTrackInterval);
       Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to false'`;
+      activateEnabled = true;
     } else {
       // Show the window
       await Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to true'`;
@@ -127,7 +137,7 @@ function setUpGlobals() {
       await mainWindow.show();
       await delay(200);
       mainWindow.webContents.send('mainChannel', { command: 'scrollUp' });
-      getTrackInterval = setInterval(() => getTrack(), 500);
+      getTrackInterval = setInterval(() => getTrack(), 1000);
     }
   });
 }
@@ -150,6 +160,7 @@ function setUpListener() {
         await delay(500);
         mainWindow.hide();
         Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to false'`;
+        activateEnabled = true;
         break;
       case 'spotify':
         Bash.$`open -a Spotify`;
@@ -162,9 +173,28 @@ function setUpListener() {
 }
 
 function setUpHooks() {
+  console.log('yaz');
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
   });
+
+  // app.on('activate', async () => {
+  //   console.log('yo');
+  //   try {
+  //     if (activateEnabled) {
+  //       console.log('inside');
+  //       activateEnabled = false;
+  //       await Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to true'`;
+  //       await delay(200);
+  //       await mainWindow.show();
+  //       await delay(200);
+  //       mainWindow.webContents.send('mainChannel', { command: 'scrollUp' });
+  //       getTrackInterval = setInterval(() => getTrack(), 500);
+  //     }
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // });
 
   app.on('before-quit', () => {
     Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to false'`;
