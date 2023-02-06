@@ -21,6 +21,7 @@ function updateTrack({ name, artist, url, repeat, shuffle, status }) {
   trackName.text(name);
   trackArtist.text(artist);
   trackImg.attr('src', url);
+
   if (status === 'playing') {
     playPause.attr('class', 'bi bi-pause-circle-fill');
   } else if (status === 'paused') {

@@ -1,5 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 body {
   background: #efeaee;
+  font-family: 'Inter', sans-serif;
   height: 90vh;
   display: flex;
   align-items: center;
@@ -31,4 +34,37 @@ button {
 
 button:hover {
   cursor: pointer;
+}
+
+
+img {
+  width: 100px;
+  display: block;
+  margin: 0 auto;
+  height: 100px;
+}
+
+
+h3,p {
+  text-align: center;
+}
+
+
+div.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+div.controls input {
+  height: 20px;
+  border-radius: 12px;
+  display: inline-block;
+  margin-left: 35px;
+}
+
+div.controls button {
+  margin: 0;
+  border-radius: 12px;
+  margin-left: 5px;
 }

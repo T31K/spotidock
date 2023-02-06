@@ -31,27 +31,14 @@ function createDock() {
   });
   mainWindow.loadFile('index.html');
   mainWindow.hide();
+  mainWindow.webContents.openDevTools();
   mainWindow.setVisibleOnAllWorkspaces(true);
-}
-
-function createSettings() {
-  settingsWindow = new BrowserWindow({
-    width: 400,
-    height: 260,
-    resizable: false,
-    webPreferences: {
-      nodeIntegration: true,
-      preload: path.join(__dirname, 'preload.js'),
-    },
-  });
-  settingsWindow.loadFile('settings.html');
-  // settingsWindow.webContents.openDevTools();
 }
 
 function createTrial() {
   trialWindow = new BrowserWindow({
-    width: 400,
-    height: 260,
+    width: 450,
+    height: 350,
     resizable: false,
     webPreferences: {
       nodeIntegration: true,
@@ -59,12 +46,11 @@ function createTrial() {
     },
   });
   trialWindow.loadFile('trial.html');
-  trialWindow.hide();
   trialWindow.on('close', (e) => {
     e.preventDefault();
     trialWindow.hide();
   });
-  // trialWindow.webContents.openDevTools();
+  trialWindow.webContents.openDevTools();
 }
 
 // App initialization
@@ -73,35 +59,36 @@ app.whenReady().then(async () => {
   let today = new Date();
   let expire = new Date(subToken.expire);
 
-  if (subToken.type === 'trial' && today.getTime() < expire.getTime() && subToken.valid) {
-    createTrial();
+  createTrial();
+  await delay(1000);
+  sendSubTokenToTrial();
+
+  if (subToken.type === 'trial' && today.getTime() >= expire.getTime()) {
+    trialWindow.show();
+  } else {
     createDock();
     setWindowPos();
     setUpGlobals();
     setUpListener();
-  } else {
-    trialWindow.show();
   }
 });
 
 // Helpers
 async function getTrack() {
   try {
-    let name = await Bash.$`osascript -e 'tell application "Spotify" to name of current track'`;
-    let artist = await Bash.$`osascript -e 'tell application "Spotify" to artist of current track'`;
-    let url = await Bash.$`osascript -e 'tell application "Spotify" to artwork url of current track'`;
-    let repeat = await Bash.$`osascript -e 'tell application "Spotify" to repeating'`;
-    let shuffle = await Bash.$`osascript -e 'tell application "Spotify" to shuffling'`;
-    let status = await Bash.$`osascript -e 'tell application "Spotify" to player state'`;
+    let trackInfo =
+      await Bash.$`osascript -e 'tell application "Spotify" to {name of current track, artist of current track, artwork url of current track, repeating, shuffling, player state}'`;
+    let trackInfoArray = trackInfo.raw.split(',');
+    let [name, artist, url, repeat, shuffle, status] = trackInfoArray;
     await mainWindow.webContents.send('mainChannel', {
       command: 'updateTrack',
       data: {
-        name: name.raw,
-        artist: artist.raw,
-        url: url.raw,
-        repeat: repeat.raw,
-        shuffle: shuffle.raw,
-        status: status.raw,
+        name,
+        artist,
+        url,
+        repeat,
+        shuffle,
+        status: status.trim(),
       },
     });
   } catch (err) {
@@ -114,10 +101,6 @@ function setWindowPos() {
   let height = mainScreen.size.height;
   let width = mainScreen.size.width;
   mainWindow.setPosition((width - 1150) / 2, height + 1000);
-  screen.on('swipe', (event) => {
-    console.log(event);
-    // code to handle the swipe event
-  });
 }
 
 function setUpGlobals() {
@@ -137,7 +120,7 @@ function setUpGlobals() {
       await mainWindow.show();
       await delay(200);
       mainWindow.webContents.send('mainChannel', { command: 'scrollUp' });
-      getTrackInterval = setInterval(() => getTrack(), 1000);
+      getTrackInterval = setInterval(() => getTrack(), 5000);
     }
   });
 }
@@ -168,33 +151,20 @@ function setUpListener() {
       case 'settings':
         trialWindow.show();
         break;
+      case 'updateSubToken':
+        let newToken = store.get('subToken');
+        newToken.type = 'premium';
+        store.set('subToken', newToken);
+        trialWindow.webContents.send('mainChannel', newToken);
+        break;
     }
   });
 }
 
 function setUpHooks() {
-  console.log('yaz');
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
   });
-
-  // app.on('activate', async () => {
-  //   console.log('yo');
-  //   try {
-  //     if (activateEnabled) {
-  //       console.log('inside');
-  //       activateEnabled = false;
-  //       await Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to true'`;
-  //       await delay(200);
-  //       await mainWindow.show();
-  //       await delay(200);
-  //       mainWindow.webContents.send('mainChannel', { command: 'scrollUp' });
-  //       getTrackInterval = setInterval(() => getTrack(), 500);
-  //     }
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // });
 
   app.on('before-quit', () => {
     Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to false'`;
@@ -207,8 +177,13 @@ function setUpSubToken() {
   sevenDaysLater.setDate(sevenDaysLater.getDate() + 7);
   store.set('subToken', { type: 'trial', date: today, expire: sevenDaysLater, valid: true });
 }
+
 function delay(time) {
   return new Promise((resolve) => {
     setTimeout(resolve, time);
   });
+}
+
+function sendSubTokenToTrial() {
+  trialWindow.webContents.send('mainChannel', subToken);
 }
