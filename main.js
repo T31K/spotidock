@@ -1,4 +1,4 @@
-const { app, BrowserWindow, globalShortcut, screen, ipcMain, powerMonitor, Notification } = require('electron');
+const { app, BrowserWindow, globalShortcut, screen, ipcMain, powerMonitor, Notification, Menu } = require('electron');
 const { Bash } = require('node-bash');
 const path = require('path');
 const store = new (require('electron-store'))();
@@ -7,8 +7,11 @@ const store = new (require('electron-store'))();
 let mainWindow;
 let settingsWindow;
 var getTrackInterval;
-let activateEnabled = true;
-app.dock.hide();
+let getTrackRetries = 0;
+let allowActivate = true;
+let allowError = true;
+const menu = Menu.buildFromTemplate([]);
+Menu.setApplicationMenu(menu);
 let subToken = store.get('subToken');
 if (!subToken) setUpSubToken();
 setUpHooks();
@@ -37,8 +40,8 @@ function createDock() {
 
 function createTrial() {
   trialWindow = new BrowserWindow({
-    width: 450,
-    height: 350,
+    width: 500,
+    height: 500,
     resizable: false,
     webPreferences: {
       nodeIntegration: true,
@@ -46,6 +49,9 @@ function createTrial() {
     },
   });
   trialWindow.loadFile('trial.html');
+  if (subToken.type === 'premium') {
+    trialWindow.hide();
+  }
   trialWindow.on('close', (e) => {
     e.preventDefault();
     trialWindow.hide();
@@ -92,6 +98,7 @@ async function getTrack() {
       },
     });
   } catch (err) {
+    getTrackRetries++;
     console.log(err);
   }
 }
@@ -106,21 +113,36 @@ function setWindowPos() {
 function setUpGlobals() {
   globalShortcut.register('CommandOrControl+`', async () => {
     if (mainWindow.isVisible()) {
-      // Hide the window
+      // Hide the dock
       mainWindow.webContents.send('mainChannel', { command: 'scrollDown' });
       await delay(500);
       mainWindow.hide();
       clearInterval(getTrackInterval);
       Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to false'`;
-      activateEnabled = true;
+      allowActivate = true;
+      console.log('globalShortcut.if');
+      console.log(allowActivate);
     } else {
-      // Show the window
+      // Show the dock
       await Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to true'`;
       await delay(200);
       await mainWindow.show();
       await delay(200);
       mainWindow.webContents.send('mainChannel', { command: 'scrollUp' });
-      getTrackInterval = setInterval(() => getTrack(), 5000);
+      getTrackRetries = 1;
+      if (!allowError) return;
+      getTrackInterval = setInterval(() => {
+        if (getTrackRetries > 10) {
+          clearInterval(getTrackInterval);
+          console.log('END_________________END');
+          sendErrorDetected();
+        } else {
+          getTrack();
+        }
+      }, 700);
+      allowActivate = false;
+      console.log('globalShortcut.else');
+      console.log(allowActivate);
     }
   });
 }
@@ -139,11 +161,11 @@ function setUpListener() {
         Bash.$`osascript -e 'tell application "Spotify" to playpause'`;
         break;
       case 'toggle':
+        allowActivate = true;
         mainWindow.webContents.send('mainChannel', { command: 'scrollDown' });
         await delay(500);
         mainWindow.hide();
         Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to false'`;
-        activateEnabled = true;
         break;
       case 'spotify':
         Bash.$`open -a Spotify`;
@@ -157,6 +179,16 @@ function setUpListener() {
         store.set('subToken', newToken);
         trialWindow.webContents.send('mainChannel', newToken);
         break;
+      case 'refresh':
+        getTrackInterval = setInterval(() => {
+          if (getTrackRetries > 10) {
+            clearInterval(getTrackInterval);
+            sendErrorDetected();
+          } else {
+            allowError = true;
+            getTrack();
+          }
+        }, 700);
     }
   });
 }
@@ -168,6 +200,32 @@ function setUpHooks() {
 
   app.on('before-quit', () => {
     Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to false'`;
+  });
+
+  app.on('activate', async () => {
+    if (allowActivate) {
+      allowActivate = false;
+      // Show the dock
+      await Bash.$`osascript -e 'tell application "System Events" to set the autohide of the dock preferences to true'`;
+      await delay(200);
+      await mainWindow.show();
+      await delay(200);
+      mainWindow.webContents.send('mainChannel', { command: 'scrollUp' });
+      getTrackRetries = 1;
+      if (!allowError) return;
+      getTrackInterval = setInterval(() => {
+        if (getTrackRetries > 10) {
+          clearInterval(getTrackInterval);
+          console.log('END_________________END');
+          sendErrorDetected();
+        } else {
+          getTrack();
+        }
+      }, 700);
+      await delay(200);
+      console.log('app.on.activate');
+      console.log(allowActivate);
+    }
   });
 }
 
@@ -186,4 +244,10 @@ function delay(time) {
 
 function sendSubTokenToTrial() {
   trialWindow.webContents.send('mainChannel', subToken);
+}
+
+function sendErrorDetected() {
+  getTrackRetries = 0;
+  allowError = false;
+  mainWindow.webContents.send('mainChannel', { command: 'errorDetected' });
 }

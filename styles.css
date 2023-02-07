@@ -32,6 +32,24 @@ background-color: rgba(255, 255, 255, 0);
   top: 0px !important;
 }
 
+#error {
+  width: 100%;
+  top: 90px;
+  position: absolute;
+  height: 76px;
+  background: #222;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  margin-top: 8.5px;
+  justify-content: center;
+  transition: top 0.2s ease-in-out;
+}
+
+#error.active {
+  top: 0px !important;
+}
+
 div.left {
   display: flex;
   width: 30%;
@@ -61,7 +79,6 @@ div.fav-box {
 i.bxs-heart {
   font-size: 15px;
   color: #1ed760;
-  
 }
 img {
   width: 50px;
@@ -70,11 +87,16 @@ img {
   
 }
 
-p, h4 {
+p, h4, h3{
   margin: 0;
   margin-left: 10px;
   color: white;
   font-family: 'Inter', sans-serif;
+}
+
+h3 {
+  text-align: center;
+  margin-right: 15px;
 }
 
 p:hover, h4:hover {
@@ -134,7 +156,7 @@ i.bx-moon{
   font-size: 18px;
 } 
 
-i.bx-toggle-left, i.bxl-spotify, i.bxs-cog {
+i.bx-toggle-left, i.bxl-spotify, i.bxs-cog, i.bx-refresh {
   margin: 0 4px;
   font-size: 20px;
   padding: 6px;

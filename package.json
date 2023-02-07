@@ -15,9 +15,15 @@
     "demo"
   ],
   "build": {
-    "extends": null,
-    "prune": true,
-    "compression": "maximum"
+    "appId": "com.docktopus.docktopus-app",
+    "productName": "Docktopus",
+    "directories": {
+      "output": "dist"
+    },
+    "icon": "assets/icon.icns",
+    "mac": {
+      "target": "dmg"
+    }
   },
   "author": "T31K",
   "license": "CC0-1.0",

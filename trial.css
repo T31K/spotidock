@@ -68,3 +68,14 @@ div.controls button {
   border-radius: 12px;
   margin-left: 5px;
 }
+
+a {
+  color: black;
+  font-weight: 700;
+  text-decoration: none;
+  text-align: center;
+  display: block;
+  margin: 0 auto;
+  margin-bottom: 50px;
+  
+}

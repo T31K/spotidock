@@ -40,8 +40,8 @@ submitBtn.on('click', async () => {
   console.log(json);
 });
 
-window.addEventListener('keydown', function (e) {
-  if (e.key === 'r' && (e.metaKey || e.ctrlKey)) {
-    e.preventDefault();
-  }
-});
+// window.addEventListener('keydown', function (e) {
+//   if (e.key === 'r' && (e.metaKey || e.ctrlKey)) {
+//     e.preventDefault();
+//   }
+// });

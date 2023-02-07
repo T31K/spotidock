@@ -3,6 +3,7 @@ let trackArtist = $('#track-artist');
 let trackImg = $('#track-img');
 let playPause = $('#playpause');
 let main = $('#main');
+let error = $('#error');
 
 ipcRenderer.receive('mainChannel', (res) => {
   let { command, data } = res;
@@ -14,6 +15,12 @@ ipcRenderer.receive('mainChannel', (res) => {
   }
   if (command === 'scrollDown') {
     main.removeClass('active');
+  }
+
+  if (command === 'errorDetected') {
+    main.hide();
+    error.show();
+    error.addClass('active');
   }
 });
 
@@ -61,4 +68,11 @@ $('.bxl-spotify').on('click', () => {
 
 $('.bxs-cog').on('click', () => {
   sendMessage('settings');
+});
+
+$('.bx-refresh').on('click', () => {
+  sendMessage('refresh');
+  error.removeClass('active');
+  error.hide();
+  main.show();
 });
