@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 body {
   margin: 0;
   padding: 0;
@@ -80,6 +81,7 @@ i.bxs-heart {
   font-size: 15px;
   color: #1ed760;
 }
+
 img {
   width: 50px;
   border-radius: 10px;
@@ -87,7 +89,7 @@ img {
   
 }
 
-p, h4, h3{
+p, h4, h3 {
   margin: 0;
   margin-left: 10px;
   color: white;
@@ -167,11 +169,11 @@ i.bx-toggle-left, i.bxl-spotify, i.bxs-cog, i.bx-refresh {
 i:hover {
   cursor: pointer;
 }
-.titlebar {
+/* .titlebar {
   -webkit-user-select: none;
   -webkit-app-region: drag;
 }
 
 .titlebar-button {
   -webkit-app-region: no-drag;
-}
+} */
